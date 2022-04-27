@@ -99,22 +99,21 @@
 
     <div id="main-container">
         <div id="header">
-            <div>
-                Find Stores Near:
-                <button id="mylocation" style class="inputs">My Location</button>
+            <div style="display: none;">
+                <div>
+                    Find Stores Near:
+                    <button id="mylocation" style class="inputs">My Location</button>
+                </div>
+                <div>
+                    <input id="searchTextField" style="width:300px;" class="inputs" placeholder="Enter an address">
+                </div>
             </div>
             <div>
-                <input id="searchTextField" style="width:300px;" class="inputs" placeholder="Enter an address">
-            </div>
-            <div>
-                Search Radius
+                Type
                 <select name="storelocator-search_radius" id="storelocator" class="inputs" aria-label="Search Radius">
-                    <option value="5">5 mi</option>
-                    <option value="10">10 mi</option>
-                    <option value="25">25 mi</option>
-                    <option value="50">50 mi</option>
-                    <option value="100">100 mi</option>
-                    <option value="Unlimited" selected="">Unlimited</option>
+                    <option value="all">All</option>
+                    <option value="gym">Gym</option>
+                    <option value="coach">Coach</option>
                 </select>
             </div>
         </div>
@@ -164,7 +163,7 @@
                 scaledSize: new google.maps.Size(50, 50), // size
             };
 
-            d3.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vR6BdWC43f-N6CEvzgwAq-mjdlr_JViF-g0A9IXQVfQINK6UZ54CnPgLbYen7oKl3PwQHicuGt92CCn/pub?output=csv")
+            d3.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vTtpslnhZOqWsp00ufBCOKlL6-6O2053pTMKC2OHkIQ_4P73-YN6galxLSyfP8XFrTHALAkX_T6i_Cx/pub?output=csv")
                 .then(locations => {
                     console.log('locations', locations);
                     // Add some markers to the map.
@@ -173,6 +172,7 @@
                         .map(data => {
                             const marker = new google.maps.Marker({
                                 position: { lat: +data.lat, lng: +data.lng },
+                                type: data['Provider Type']
                             });
                             marker.addListener("click", () => {
                                 infowindow.setContent(createInfo(data));
@@ -192,10 +192,9 @@
             function createInfo(data) {
                 const div = `
                     <div class="card">
-                        <div class="item"><b>${data['Company Name']}</b></div>
-                        <div class="item">${data['Phone Number']}</div>
-                        <div class="item">${data['Website']}</div>
-                        <div class="item">${data['Address']}</div>
+                        <div class="item"><b>${data['county_name']}</b></div>
+                        <div class="item">${data['Provider Type']}</div>
+                        <div class="item">${data['population']}</div>
                     </div>
                 `;
                 return div;
@@ -256,31 +255,29 @@
             })
             storelocator.addEventListener("change", () => {
 
-                const radius = storelocator.value
-                console.log('raduis', radius);
-
-                if (radius.toLowerCase() === "unlimited") {
-                    allMarkers.forEach(marker => marker.setVisible(true))
-                    markerCluster.removeMarkers(allMarkers)
-                    markerCluster.addMarkers(allMarkers)
-                    return
-                };
-                if (Object.keys(userLocation).length === 0) return;
+                const type = storelocator.value
+                console.log('type', type);
 
                 allMarkers.forEach(marker => {
 
-                    const distance = google.maps.geometry.spherical.computeDistanceBetween(marker.getPosition(), userLocation) / 1609;
-                    if (radius >= +distance) {
+                    if (type.toLowerCase() === "all") {
                         marker.setVisible(true)
                         markerCluster.addMarker(marker)
-                        console.log('+distance', +distance, radius);
+                        return;
+                    }
+
+                    if (marker.type.toLowerCase() === type.toLowerCase()) {
+                        marker.setVisible(true)
+                        markerCluster.addMarker(marker)
                     } else {
                         marker.setVisible(false)
                         markerCluster.removeMarker(marker)
                     }
+
+
                 })
-                
-                map.setCenter(userLocation)
+
+                //map.setCenter(userLocation)
             })
 
             function getLocation() {
@@ -373,7 +370,7 @@
         }
     </script>
     <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVqjQ5vLneUmdshaAxbNTn0jY6o-Ia_TI&callback=initMap&libraries=places,drawing,geometry&v=weekly"
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAeol-9b3ACgUqMMwpR5URWH6BLFjY-6e0&callback=initMap&libraries=places,drawing,geometry&v=weekly"
         async></script>
 </body>
 
