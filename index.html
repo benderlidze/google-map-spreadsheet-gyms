@@ -6,7 +6,7 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <title>Google Maps Multiple Markers</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
     <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
 </head>
 <style>
@@ -170,13 +170,14 @@
                         .map(data => {
                             const marker = new google.maps.Marker({
                                 position: { lat: +data.lat, lng: +data.lng },
-                                type: data['Provider Type']
+                                type: data['Provider Type'],
+                                text: createInfo(data)
                             });
                             marker.addListener("click", () => {
                                 infowindow.setContent(createInfo(data));
                                 infowindow.open(map, marker);
                             });
-                            cardsDiv.appendChild(createCard(data, marker))
+                            cardsDiv.appendChild(createCard(marker))
                             allMarkers.push(marker)
                             return marker;
                         });
@@ -198,13 +199,16 @@
                 return div;
             }
 
-            function createCard(data, marker) {
+            function updateCards(markersArray) {
+                console.log('markersArray', markersArray);
+                cardsDiv.replaceChildren()
+                markersArray.map(marker => cardsDiv.appendChild(createCard(marker)))
+            }
 
-                const card = createInfo(data)
+            function createCard(marker) {
                 const div = document.createElement("div")
-                div.innerHTML = card
+                div.innerHTML = marker.text
                 div.addEventListener("click", () => {
-                    console.log('123', marker);
                     new google.maps.event.trigger(marker, 'click');
                     map.setZoom(19)
                     map.setCenter(marker.getPosition())
@@ -255,9 +259,7 @@
 
                 const type = storelocator.value
                 console.log('type', type);
-
                 allMarkers.forEach(marker => {
-
                     if (type.toLowerCase() === "all") {
                         marker.setVisible(true)
                         markerCluster.addMarker(marker)
@@ -271,8 +273,6 @@
                         marker.setVisible(false)
                         markerCluster.removeMarker(marker)
                     }
-
-
                 })
 
                 //map.setCenter(userLocation)
@@ -317,53 +317,57 @@
                     icon: image,
                 });
 
-                const points = mainData.filter(point => {
-                    return point.lat && point.lng
-                })
-
-                // var center = [+place.geometry.location.lng(), +place.geometry.location.lat()];
-                // var from = turf.point(center);
-                // points.forEach(point => {
-                //     var to = turf.point([+point.lng, +point.lat]);
-                //     var options = { units: 'miles' };
-                //     var distance = turf.distance(from, to, options);
-                //     point.distance = distance
+                // const points = mainData.filter(point => {
+                //     return point.lat && point.lng
                 // })
 
-                /*
-                const number = +document.querySelector('input[name="results"]:checked').value
-                console.log('number@@@@', number);
-                const closest = points.sort((a, b) => {
-                    return a.distance - b.distance
-                }).slice(0, number)
- 
-                const infoContent = closest.map(row => {
-                    text = `
-                    <div class="item" data-address="${row['Address']}, ${row['City']}, ${row['zip']}">
-                        ${row['Address']}, 
-                        ${row['City']}, 
-                        ${row['Panel Location']}
-                    </div>
-                    `
-                    return text;
+                var center = [+place.geometry.location.lng(), +place.geometry.location.lat()];
+                var from = turf.point(center);
+                allMarkers.forEach(point => {
+                    const { lat, lng } = point.getPosition().toJSON()
+                    var to = turf.point([+lng, lat]);
+                    var options = { units: 'miles' };
+                    var distance = turf.distance(from, to, options);
+                    point.distance = distance
                 })
- 
-                info.style.display = 'block'
-                pannel.style.display = 'block';
-                info.innerHTML = `
-                    <div>
-                        <button class="removeAddresses">Close</button>
-                    </div> 
-                    ${infoContent.join("")}
-                `;
-                */
+
+
+                //const number = +document.querySelector('input[name="results"]:checked').value
+                // console.log('number@@@@', number);
+                const closest = allMarkers.sort((a, b) => {
+                    return a.distance - b.distance
+                }).slice(0, 5)
+
+                updateCards(closest)
+
+                // const infoContent = closest.map(row => {
+                //     text = `
+                //     <div class="item" data-address="${row['Address']}, ${row['City']}, ${row['zip']}">
+                //         ${row['Address']}, 
+                //         ${row['City']}, 
+                //         ${row['Panel Location']}
+                //     </div>
+                //     `
+                //     return text;
+                // })
+
+                // info.style.display = 'block'
+                // pannel.style.display = 'block';
+                // info.innerHTML = `
+                //     <div>
+                //         <button class="removeAddresses">Close</button>
+                //     </div> 
+                //     ${infoContent.join("")}
+                // `;
+
+
                 // var bounds = new google.maps.LatLngBounds();
                 // closest
                 //     .map(pin => {
                 //         addMarker(pin)
                 //         bounds.extend({ lng: +pin.lng, lat: +pin.lat });
                 //     })
-                //map.fitBounds(bounds);
+                // map.fitBounds(bounds);
             });
         }
     </script>
