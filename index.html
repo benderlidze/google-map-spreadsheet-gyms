@@ -73,7 +73,10 @@
         overflow: hidden;
         background-color: #00a9dc;
         cursor: pointer;
-        color: white
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-content: center;
     }
 
     .card>.item {
@@ -96,6 +99,8 @@
         background-color: white;
         padding: 10px 20px;
     }
+
+    .card
 </style>
 
 <body>
@@ -194,9 +199,14 @@
             function createInfo(data) {
                 const div = `
                     <div class="card">
-                        <div class="item"><b>${data['county_name']}</b></div>
-                        <div class="item">${data['Provider Type']}</div>
-                        <div class="item">${data['population']}</div>
+                        <div class="leftCol">
+                            <div class="item"><b>${data['county_name']}</b></div>
+                            <div class="item">${data['Provider Type']}</div>
+                            <div class="item">${data['population']}</div>
+                        </div>
+                        <div>
+                            <img style="width:50px;" src="https://thumbs.dreamstime.com/b/fitness-center-logo-sport-fitness-logo-design-gym-logo-icon-design-vector-stock-fitness-center-logo-sport-fitness-logo-206107542.jpg">
+                        </div>
                     </div>
                 `;
                 return div;
