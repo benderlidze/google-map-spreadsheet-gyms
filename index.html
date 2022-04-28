@@ -28,14 +28,14 @@
 
     #main-container {
         width: 100%;
-        border: 1px solid gray;
+        /* border: 1px solid gray; */
     }
 
     #cards {
         min-width: 300px;
         width: 40%;
         overflow-y: auto;
-        background-color: #f4f4f4;
+        background-color: #131d4b;
     }
 
     #map {
@@ -58,19 +58,20 @@
     }
 
     #cards>div>.card {
-        border: 1px solid rgb(226, 226, 226);
+        border: 1px solid #00a9dc;
     }
 
     #cards>div>.card:hover {
-        border: 1px solid rgb(141, 141, 141);
+        border: 1px solid #00a9dc;
     }
 
     .card {
         padding: 10px;
         margin: 10px;
         overflow: hidden;
-        background-color: white;
+        background-color: #00a9dc;
         cursor: pointer;
+        color: white
     }
 
     .card>.item {
@@ -116,8 +117,8 @@
             </div>
         </div>
         <div id="container">
-            <div id="cards"></div>
             <div id="map"></div>
+            <div id="cards"></div>
         </div>
     </div>
 
