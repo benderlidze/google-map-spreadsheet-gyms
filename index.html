@@ -107,6 +107,29 @@
         font-size: 1.5rem;
     }
 
+    /* #cards .hire {
+        background-color: white;
+        color: #131d4b
+    } */
+
+    .hire {
+        border: 1px solid #131d4b;
+        padding: 2px 5px;
+        white-space: nowrap;
+        border-radius: 5px;
+        font-weight: bold;
+        background-color: white;
+        color: #131d4b
+    }
+
+    .rightCol {
+        display: flex;
+        flex-direction: column;
+        align-content: flex-end;
+        justify-content: space-between;
+        align-items: flex-end;
+    }
+
     @media only screen and (min-device-width: 1300px) {
         .resetMap {
             left: 180px;
@@ -123,6 +146,9 @@
         padding: 10px 20px;
     }
 
+    #clear {
+        padding: 5px;
+    }
 
     .gm-style .gm-style-iw-d::-webkit-scrollbar-track,
     .gm-style .gm-style-iw-d::-webkit-scrollbar-track-piece,
@@ -155,6 +181,8 @@
                 </select>
                 <input id="searchTextField" style="width:300px;" class="inputs"
                     placeholder="Enter a city, address or postal code">
+
+                <button id="clear">Clear search</button>
             </div>
         </div>
         <div id="container">
@@ -177,6 +205,7 @@
         let map;
         let setCenter = true;
         let currentPoly;
+        const clear = document.getElementById('clear');
         const mylocation = document.getElementById('mylocation');
         const storelocator = document.getElementById('storelocator');
         const cardsDiv = document.getElementById('cards');
@@ -282,8 +311,6 @@
                         .filter(i => i.Latitude && i.Longitude)
                         .map(data => {
 
-                            console.log('data.', data['Location Type']);
-
                             const mIcon = { ...markerImage, fillColor: data['Location Type'] === "Coach" ? colors.accent : colors.primary }
                             const mLabel = { ...label, text: data['Location Type'] === "Gym" ? "G" : "C" }
 
@@ -321,122 +348,7 @@
                     markerCluster = new MarkerClusterer(map, markers, { styles: cluster_styles });
                 })
 
-
-            function createInfo(data) {
-                console.log('data', data);
-                const dist = (data.distance && data.distance > 0) ? `<div class="dist">Distance: ${data.distance} miles</div>` : ``
-                const div = `
-                <div class="card" >
-                    <div class="leftCol">
-                        <div class="title"><b>${data['Title']}</b></div>
-                        <div class="phone">${data['Main Contact ']}</div>
-                        <div class="web">
-                            <a href="${data['Link URL (_blank)']}" target="_blank">${data['Secondary Contact']}</a>
-                        </div>
-                        <div class="addr">${data['Address Line 1']}</div>
-                        <div class="addr">${data['Address Line 2']}</div>
-                        ${dist}
-                    </div>
-                    <div>
-                        <img style="width:50px;" src="https://thumbs.dreamstime.com/b/fitness-center-logo-sport-fitness-logo-design-gym-logo-icon-design-vector-stock-fitness-center-logo-sport-fitness-logo-206107542.jpg">
-                    </div>
-                </div>
-                `;
-                return div;
-            }
-
-            function updateCards(markersArray) {
-                console.log('markersArray', markersArray);
-                cardsDiv.replaceChildren()
-                markersArray.map(marker => cardsDiv.appendChild(createCard(marker)))
-            }
-
-            function createCard(marker) {
-                console.log('marker', marker);
-                const div = document.createElement("div")
-                div.innerHTML = createInfo(marker.data)
-                div.addEventListener("click", () => {
-                    new google.maps.event.trigger(marker, 'click');
-                    map.setZoom(19)
-                    map.setCenter(marker.getPosition())
-                })
-                return div
-            }
-
-            // function addMarker(pin, color) {
-
-            //     const icon = {
-            //         url: "icons/sun.png", // url
-            //         scaledSize: new google.maps.Size(50, 50), // size
-            //     };
-
-            //     const marker = new google.maps.Marker({
-            //         position: { lng: +pin.lng, lat: +pin.lat },
-            //         map: map,
-            //         //options: pin,
-            //         icon: icon,
-            //     });
-
-            //     marker.addListener('mouseover', function () { });
-            //     marker.addListener('mouseout', function () { });
-
-            //     marker.addListener("click", e => {
-            //         const content = `
-            //             <div>
-            //                 <h3>
-            //                     ${pin['Address']},
-            //                     ${pin['City']},
-            //                     ${pin['Panel Location']}</h3>
-            //             </div>`
-            //         infowindow.setContent(content);
-            //         infowindow.open(map, marker);
-            //     });
-
-            //     allMarkers.push(marker);
-            // }
-
-            mylocation.addEventListener("click", () => {
-                getLocation()
-            })
-            storelocator.addEventListener("change", () => {
-                const type = storelocator.value
-                console.log('type', type);
-                allMarkers.forEach(marker => {
-                    if (type.toLowerCase() === "all") {
-                        marker.setVisible(true)
-                        markerCluster.addMarker(marker)
-                        return;
-                    }
-
-                    if (marker.type.toLowerCase() === type.toLowerCase()) {
-                        marker.setVisible(true)
-                        markerCluster.addMarker(marker)
-                    } else {
-                        marker.setVisible(false)
-                        markerCluster.removeMarker(marker)
-                    }
-                })
-
-                //map.setCenter(userLocation)
-            })
-
-            function getLocation() {
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(showPosition);
-                } else {
-                    alert("Geolocation is not supported by this browser.");
-                }
-            }
-
-            function showPosition(position) {
-                var lat = position.coords.latitude;
-                var lng = position.coords.longitude;
-
-                map.setCenter(new google.maps.LatLng(lat, lng));
-                map.setZoom(14);
-
-                userLocation = new google.maps.LatLng(lat, lng)
-            }
+            clear.addEventListener("click", clearSearch)
 
             const geocoder = new google.maps.Geocoder()
             var options = {
@@ -462,10 +374,6 @@
                     icon: image,
                 });
 
-                // const points = mainData.filter(point => {
-                //     return point.lat && point.lng
-                // })
-
                 var center = [+place.geometry.location.lng(), +place.geometry.location.lat()];
                 var from = turf.point(center);
                 allMarkers.forEach(point => {
@@ -477,44 +385,112 @@
                 })
 
 
-                //const number = +document.querySelector('input[name="results"]:checked').value
-                // console.log('number@@@@', number);
                 const closest = [...allMarkers].sort((a, b) => {
                     return a.data.distance - b.data.distance
                 }).slice(0, 5)
 
                 updateCards(closest)
 
-                // const infoContent = closest.map(row => {
-                //     text = `
-                //     <div class="item" data-address="${row['Address']}, ${row['City']}, ${row['zip']}">
-                //         ${row['Address']}, 
-                //         ${row['City']}, 
-                //         ${row['Panel Location']}
-                //     </div>
-                //     `
-                //     return text;
-                // })
-
-                // info.style.display = 'block'
-                // pannel.style.display = 'block';
-                // info.innerHTML = `
-                //     <div>
-                //         <button class="removeAddresses">Close</button>
-                //     </div> 
-                //     ${infoContent.join("")}
-                // `;
-
-
-                // var bounds = new google.maps.LatLngBounds();
-                // closest
-                //     .map(pin => {
-                //         addMarker(pin)
-                //         bounds.extend({ lng: +pin.lng, lat: +pin.lat });
-                //     })
-                // map.fitBounds(bounds);
             });
         }
+        function createInfo(data) {
+            const dist = (data.distance && data.distance > 0) ? `<div class="dist">Distance: ${data.distance} miles</div>` : ``
+            const hire = data['Hiring'].toLowerCase() === 'yes' ? `<div class="hire">NOW HIRING</div>` : ""
+            const div = `
+                <div class="card" >
+                    <div class="leftCol">
+                        <div class="title"><b>${data['Title']}</b></div>
+                        <div class="phone">${data['Main Contact ']}</div>
+                        <div class="web">
+                            <a href="${data['Link URL (_blank)']}" target="_blank">${data['Secondary Contact']}</a>
+                        </div>
+                        <div class="addr">${data['Address Line 1']}</div>
+                        <div class="addr">${data['Address Line 2']}</div>
+                        ${dist}
+                    </div>
+                    <div class="rightCol">
+                        <img style="width:50px;" src="https://thumbs.dreamstime.com/b/fitness-center-logo-sport-fitness-logo-design-gym-logo-icon-design-vector-stock-fitness-center-logo-sport-fitness-logo-206107542.jpg">
+                        ${hire}
+                    </div>
+                </div>
+                `;
+            return div;
+        }
+
+        function updateCards(markersArray) {
+            cardsDiv.replaceChildren()
+            markersArray.map(marker => cardsDiv.appendChild(createCard(marker)))
+        }
+
+        function createCard(marker) {
+
+            const div = document.createElement("div")
+            div.innerHTML = createInfo(marker.data)
+            div.addEventListener("click", () => {
+                new google.maps.event.trigger(marker, 'click');
+                map.setZoom(19)
+                map.setCenter(marker.getPosition())
+            })
+            return div
+        }
+
+
+        mylocation.addEventListener("click", () => {
+            getLocation()
+        })
+
+        storelocator.addEventListener("change", () => {
+            const type = storelocator.value
+            allMarkers.forEach(marker => {
+                if (type.toLowerCase() === "all") {
+                    marker.setVisible(true)
+                    markerCluster.addMarker(marker)
+                    return;
+                }
+
+                if (marker.type.toLowerCase() === type.toLowerCase()) {
+                    marker.setVisible(true)
+                    markerCluster.addMarker(marker)
+                } else {
+                    marker.setVisible(false)
+                    markerCluster.removeMarker(marker)
+                }
+            })
+
+            //map.setCenter(userLocation)
+        })
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition);
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        function showPosition(position) {
+            var lat = position.coords.latitude;
+            var lng = position.coords.longitude;
+
+            map.setCenter(new google.maps.LatLng(lat, lng));
+            map.setZoom(14);
+
+            userLocation = new google.maps.LatLng(lat, lng)
+        }
+
+        function clearSearch() {
+            updateCards(allMarkers.map(point => {
+                point.data.distance = 0
+                return point
+            }))
+            input.value = '';
+            map.setCenter(mapCenter)
+            map.setZoom(mapZoom)
+            searchMarker.setMap(null)
+        }
+
+
+
     </script>
     <script
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAeol-9b3ACgUqMMwpR5URWH6BLFjY-6e0&callback=initMap&libraries=places,drawing,geometry&v=weekly"
