@@ -103,6 +103,10 @@
     }
 
     .title {
+        /* font-size: 1.5rem; */
+    }
+
+    #cards .title {
         font-size: 1.5rem;
     }
 
@@ -194,6 +198,11 @@
         margin: 0px !important;
         padding-bottom: 0 !important;
         padding-right: 0 !important;
+    }
+
+    .gm-style-iw,
+    .gm-style-iw-a {
+        min-width: 340px !important;
     }
 </style>
 
@@ -377,7 +386,7 @@
                         }]
 
                     };
-                    markerCluster = new MarkerClusterer(map, markers, { styles: cluster_styles });
+                    markerCluster = new MarkerClusterer(map, markers, { maxZoom: 10, styles: cluster_styles });
                 })
 
             clear.addEventListener("click", clearSearch)
@@ -425,6 +434,24 @@
 
             });
         }
+
+        function clusterMap() {
+            for (var i = 0; i < allMarkers.length; i++) {
+                allMarkers[i].setOptions({ map: null, visible: false });
+            }
+            markerCluster = new MarkerClusterer(map, markers);
+            // markerCluster.refresh();
+        }
+
+        function unclusterMap() {
+            markerCluster.clearMarkers();
+            // markerCluster.refresh();
+            for (var i = 0; i < allMarkers.length; i++) {
+                allMarkers[i].setOptions({ map: map, visible: true });
+            }
+        }
+
+
         function createInfo(data) {
             const dist = (data.distance && data.distance > 0) ? `<div class="dist">Distance: ${data.distance} miles</div>` : ``
             const hire = data['Hiring'].toLowerCase() === 'yes' ? `<div class="hire">NOW HIRING</div>` : ""
@@ -455,11 +482,11 @@
         }
 
         function createCard(marker) {
-
             const div = document.createElement("div")
             div.innerHTML = createInfo(marker.data)
             div.addEventListener("click", () => {
                 new google.maps.event.trigger(marker, 'click');
+                console.log('marker', marker);
                 map.setZoom(13)
                 map.setCenter(marker.getPosition())
             })
@@ -538,8 +565,6 @@
 
             hire.checked = false
         }
-
-
 
     </script>
     <script
