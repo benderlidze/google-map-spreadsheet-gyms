@@ -163,15 +163,17 @@
         margin: 0 10px;
     }
 
-    .inputs {
-        border: 1px solid gray;
-        background-color: white;
+
+    input,
+    select,
+    button {
+        -ms-box-sizing: content-box;
+        -moz-box-sizing: content-box;
+        -webkit-box-sizing: content-box;
+        box-sizing: content-box;
         padding: 10px 20px;
     }
 
-    #clear {
-        padding: 5px;
-    }
 
     .gm-style .gm-style-iw-d::-webkit-scrollbar-track,
     .gm-style .gm-style-iw-d::-webkit-scrollbar-track-piece,
@@ -182,6 +184,16 @@
 
     .gm-ui-hover-effect>span {
         background-color: white;
+    }
+
+    .gm-style .gm-style-iw-c {
+        padding: 0px;
+    }
+
+    .gm-style-iw .card {
+        margin: 0px !important;
+        padding-bottom: 0 !important;
+        padding-right: 0 !important;
     }
 </style>
 
@@ -203,8 +215,11 @@
                     <option value="coach">Coach</option>
                 </select>
                 <input id="searchTextField" class="inputs" placeholder="Enter a city, address or postal code">
-
                 <button id="clear">Clear search</button>
+                <label for="hire" id="hirediv" style="display: none;">
+                    <input type="checkbox" name="" id="hire">
+                    only hiring gyms
+                </label>
             </div>
         </div>
         <div id="container">
@@ -235,6 +250,8 @@
         const pannel = document.getElementById("pannel")
         const info = document.getElementById("info")
         const modal = document.getElementById("modal")
+        const hirediv = document.getElementById("hirediv")
+        const hire = document.getElementById("hire")
 
         const drivers = [];
         const driverNames = [];
@@ -243,8 +260,8 @@
         const driverMarkers = [];
         const markersInPoly = [];
         let counts = {};
-        const mapCenter = { lat: 35.04169358003858, lng: -97.26275783887898 }
-        const mapZoom = 4
+        const mapCenter = { lat: 35.561288937074465, lng: -54.758077885148865 }
+        const mapZoom = 2
         let markerCluster
         let userLocation = {}
 
@@ -443,7 +460,7 @@
             div.innerHTML = createInfo(marker.data)
             div.addEventListener("click", () => {
                 new google.maps.event.trigger(marker, 'click');
-                map.setZoom(19)
+                map.setZoom(13)
                 map.setCenter(marker.getPosition())
             })
             return div
@@ -452,6 +469,16 @@
 
         mylocation.addEventListener("click", () => {
             getLocation()
+        })
+
+        hire.addEventListener("change", () => {
+            const checked = hire.checked
+            console.log('checked', checked);
+            if (checked) {
+                updateCards(allMarkers.filter(point => point.data['Hiring'].toLowerCase() === "yes"))
+            } else {
+                updateCards(allMarkers)
+            }
         })
 
         storelocator.addEventListener("change", () => {
@@ -472,6 +499,12 @@
                 }
             })
 
+            //display "hire" filter 
+            if (type.toLowerCase() === "gym") {
+                hirediv.style.display = 'inline'
+            } else {
+                hirediv.style.display = 'none'
+            }
             //map.setCenter(userLocation)
         })
 
@@ -501,7 +534,9 @@
             input.value = '';
             map.setCenter(mapCenter)
             map.setZoom(mapZoom)
-            searchMarker.setMap(null)
+            if (searchMarker) searchMarker.setMap(null)
+
+            hire.checked = false
         }
 
 
