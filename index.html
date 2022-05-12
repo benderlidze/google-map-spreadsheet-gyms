@@ -455,6 +455,8 @@
         function createInfo(data) {
             const dist = (data.distance && data.distance > 0) ? `<div class="dist">Distance: ${data.distance} miles</div>` : ``
             const hire = data['Hiring'].toLowerCase() === 'yes' ? `<div class="hire">NOW HIRING</div>` : ""
+
+            const logo = (data['Logo URL'] && data['Logo URL'] !== "") ? `<img style="width:50px;" src="${data['Logo URL']}">` : "<div></div>"
             const div = `
                 <div class="card" >
                     <div class="leftCol">
@@ -468,7 +470,7 @@
                         ${dist}
                     </div>
                     <div class="rightCol">
-                        <img style="width:50px;" src="https://thumbs.dreamstime.com/b/fitness-center-logo-sport-fitness-logo-design-gym-logo-icon-design-vector-stock-fitness-center-logo-sport-fitness-logo-206107542.jpg">
+                        ${logo}
                         ${hire}
                     </div>
                 </div>
