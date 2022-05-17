@@ -62,7 +62,7 @@
         border: 1px solid #00a9dc;
     } */
 
-    .card {
+    .map-card {
         min-width: 300px;
         padding: 10px;
         margin: 10px;
@@ -75,12 +75,12 @@
         align-content: center;
     }
 
-    .card>.item {
+    .map-card>.item {
         padding: 3px;
         pointer-events: none;
     }
 
-    #cards .card {
+    #cards .map-card {
         background-color: white;
         color: #131d4b
     }
@@ -458,7 +458,7 @@
 
             const logo = (data['Logo URL'] && data['Logo URL'] !== "") ? `<img style="width:50px;" src="${data['Logo URL']}">` : "<div></div>"
             const div = `
-                <div class="card" >
+                <div class="map-card" >
                     <div class="leftCol">
                         <div class="title"><b>${data['Title']}</b></div>
                         <div class="phone">${data['Main Contact ']}</div>
