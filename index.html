@@ -54,14 +54,6 @@
         color: white;
     }
 
-    /* #cards>div>.card {
-        border: 1px solid #00a9dc;
-    }
-
-    #cards>div>.card:hover {
-        border: 1px solid #00a9dc;
-    } */
-
     .map-card {
         min-width: 300px;
         padding: 10px;
@@ -109,11 +101,6 @@
     #cards .title {
         font-size: 1.5rem;
     }
-
-    /* #cards .hire {
-        background-color: white;
-        color: #131d4b
-    } */
 
     .hire {
         border: 1px solid #131d4b;
@@ -346,7 +333,6 @@
 
             d3.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vRjbyIbjO5BPRenPle3bJW0Twg6SBBsbFyHJrUP12_8Vbv6SNKszn62NURju2zA5d2CDP5YWx5gldqC/pub?gid=0&single=true&output=csv")
                 .then(locations => {
-                    console.log('locations', locations);
                     // Add some markers to the map.
                     const markers = locations
                         .filter(i => i.Latitude && i.Longitude)
@@ -373,8 +359,6 @@
                         });
 
                     // Add a marker clusterer to manage the markers.
-                    console.log('allMarkers', allMarkers);
-                    console.log('allMarkers', markers);
 
                     var options = {
                         maxZoom: 15,
@@ -399,7 +383,6 @@
             google.maps.event.addListener(autocomplete, 'place_changed', function (e) {
                 var place = autocomplete.getPlace();
                 const loc = place.geometry.location;
-                console.log('place', loc);
                 map.setCenter(place.geometry.location);
                 map.setZoom(8);
 
@@ -488,7 +471,6 @@
             div.innerHTML = createInfo(marker.data)
             div.addEventListener("click", () => {
                 new google.maps.event.trigger(marker, 'click');
-                console.log('marker', marker);
                 map.setZoom(13)
                 map.setCenter(marker.getPosition())
             })
@@ -502,7 +484,6 @@
 
         hire.addEventListener("change", () => {
             const checked = hire.checked
-            console.log('checked', checked);
             if (checked) {
                 updateCards(allMarkers.filter(point => point.data['Hiring'].toLowerCase() === "yes"))
             } else {
